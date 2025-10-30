@@ -10,8 +10,11 @@ const app = express();
 
 // ✅ Allow frontend domain (Vercel)
 app.use(cors({
-  origin: ['https://job-poster-kft5.vercel.app'], // your Vercel frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: [
+    "https://project-1-nu-two.vercel.app", // your new frontend
+    "http://localhost:3000" // for local testing
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
