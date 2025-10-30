@@ -8,19 +8,21 @@ const UserApply = require("./routes/User");
 
 const app = express();
 
-// ✅ Allow frontend domain (Vercel + localhost)
-const allowedOrigins = [
-  "https://project-1-nu-two.vercel.app", // deployed frontend
-  "http://localhost:3000",               // local testing
-];
-
+// ✅ CORS configuration
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow no-origin requests (like curl/postman)
+      if (!origin) return callback(null, true);
+
+      // Allow local & vercel domains automatically
+      if (
+        origin === "http://localhost:3000" ||
+        origin.endsWith(".vercel.app")
+      ) {
         callback(null, true);
       } else {
+        console.log("❌ Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
@@ -30,10 +32,10 @@ app.use(
   })
 );
 
-// ✅ Handle preflight requests (very important for browsers)
+// ✅ Handle preflight requests (important!)
 app.options("*", cors());
 
-// ✅ Parse JSON bodies
+// ✅ Parse JSON request bodies
 app.use(express.json());
 
 // ✅ Routes
@@ -42,17 +44,17 @@ app.use("/admin", admin);
 app.use("/company", CompanyJob);
 app.use("/user", UserApply);
 
-// ✅ MongoDB Connection
+// ✅ Root route for testing
+app.get("/", (req, res) => {
+  res.send("🚀 Backend running successfully with CORS enabled!");
+});
+
+// ✅ MongoDB connection
 mongoose
   .connect("mongodb+srv://kanneboina:nani@cluster0.wl6wuhf.mongodb.net/?appName=Cluster0")
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Root route (for quick check)
-app.get("/", (req, res) => {
-  res.send("Backend running successfully 🚀");
-});
-
-// ✅ Start Server
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}...`));
