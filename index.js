@@ -8,18 +8,19 @@ const UserApply = require("./routes/User");
 
 const app = express();
 
-// ✅ CORS configuration
+// ✅ Allowed frontend domains
+const allowedOrigins = [
+  "https://project-1-git-main-ganeshyadav97s-projects.vercel.app",
+  "https://project-1-699jojd8x-ganeshyadav97s-projects.vercel.app",
+  "http://localhost:3000", // for local testing
+];
+
+// ✅ Configure CORS
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow no-origin requests (like curl/postman)
-      if (!origin) return callback(null, true);
-
-      // Allow local & vercel domains automatically
-      if (
-        origin === "http://localhost:3000" ||
-        origin.endsWith(".vercel.app")
-      ) {
+      // Allow requests from known origins or no-origin tools (Postman, etc.)
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         console.log("❌ Blocked by CORS:", origin);
@@ -32,21 +33,21 @@ app.use(
   })
 );
 
-// ✅ Handle preflight requests (important!)
+// ✅ Handle preflight requests globally
 app.options("*", cors());
 
-// ✅ Parse JSON request bodies
+// ✅ Parse JSON
 app.use(express.json());
 
-// ✅ Routes
+// ✅ API Routes
 app.use("/auth", auth);
 app.use("/admin", admin);
 app.use("/company", CompanyJob);
 app.use("/user", UserApply);
 
-// ✅ Root route for testing
+// ✅ Root route
 app.get("/", (req, res) => {
-  res.send("🚀 Backend running successfully with CORS enabled!");
+  res.send("🚀 Backend running successfully with CORS configured!");
 });
 
 // ✅ MongoDB connection
