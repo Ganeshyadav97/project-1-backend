@@ -8,19 +8,24 @@ const UserApply = require("./routes/User");
 
 const app = express();
 
-// ✅ Allowed frontend domains
+// ✅ Allowed static origins
 const allowedOrigins = [
   "https://project-1-git-main-ganeshyadav97s-projects.vercel.app",
   "https://project-1-699jojd8x-ganeshyadav97s-projects.vercel.app",
+  "https://project-1-re648tdu0-ganeshyadav97s-projects.vercel.app", // ✅ Newly added
   "http://localhost:3000", // for local testing
 ];
 
-// ✅ Configure CORS
+// ✅ Configure dynamic + secure CORS
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests from known origins or no-origin tools (Postman, etc.)
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests from Postman (no origin) or known origins
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        /\.vercel\.app$/.test(origin) // ✅ Allow all your Vercel deployments
+      ) {
         callback(null, true);
       } else {
         console.log("❌ Blocked by CORS:", origin);
@@ -36,7 +41,7 @@ app.use(
 // ✅ Handle preflight requests globally
 app.options("*", cors());
 
-// ✅ Parse JSON
+// ✅ Middleware
 app.use(express.json());
 
 // ✅ API Routes
